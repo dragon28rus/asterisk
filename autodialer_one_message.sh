@@ -4,18 +4,6 @@ rm -f /tmp/*.wav
 
 echo "Начинаем"
 
-# Формируем текст для яндекса
-    text="Уважаемые абоненты! 17 декабря, в период с 9 до 12 часов, возможно отключение кабельного ТВ, по причине проведения профилактических работ на линии связи. Прин+осим свои извенения за доставленные неудобства.."
-
-# Отправляемся в яндекс за голосовым файликом и сохраняем его в /temp
-#curl "https://tts.voicetech.yandex.net/generate?format=wav&quality=lo&lang=ru-RU&speaker=oksana&emotion=good&key=cbea8524-b886-45c5-bd7e-5540998c89ee" -G --data-urlencode "text=$text" > /tmp/message.wav #ключ it@dvsat.ru
-curl "https://tts.voicetech.yandex.net/generate?format=wav&quality=lo&lang=ru-RU&speaker=oksana&emotion=good&key=74f4650a-cef9-4066-94e1-a77d54fb4553" -G --data-urlencode "text=$text" > /tmp/message.wav  #ключ info@dvsat.ru
-
-#Даем соответствующие права файлу
-chown asterisk:asterisk /tmp/message.wav
-chmod 775 /tmp/message.wav
-
-
 while read number; do
 
 sleep 5
@@ -41,7 +29,17 @@ fi
 if [[ $number =~ ^[8]+[0-9]{10}$ ]] ||  [[ $number =~ ^[0-9]{6}$ ]];
 then
 
-#Channel: Local/s@outboundmsg
+# Формируем текст для яндекса
+    text="Уважаемые абоненты! 17 декабря, в период с 9 до 12 часов, возможно отключение кабельного ТВ, по причине проведения профилактических работ на линии связи. Прин+осим свои извенения за доставленные неудобства.."
+
+# Отправляемся в яндекс за голосовым файликом и сохраняем его в /temp
+curl "https://tts.voicetech.yandex.net/generate?format=wav&quality=lo&lang=ru-RU&speaker=oksana&emotion=good&key=cbea8524-b886-45c5-bd7e-5540998c89ee" -G --data-urlencode "text=$text" > /tmp/$number.wav #ключ it@dvsat.ru
+#curl "https://tts.voicetech.yandex.net/generate?format=wav&quality=lo&lang=ru-RU&speaker=oksana&emotion=good&key=74f4650a-cef9-4066-94e1-a77d54fb4553" -G --data-urlencode "text=$text" > /tmp/$number.wav  #ключ info@dvsat.ru
+
+#Даем соответствующие права файлу
+chown asterisk:asterisk /tmp/$number.wav
+chmod 775 /tmp/$number.wav
+
 #Формируем файл для астериска для автоматического прозвона
 cat <<EOF  >  /var/spool/asterisk/$number
 
@@ -54,7 +52,7 @@ RetryTime: 3600
 WaitTime: 50
 Priority: 1
 Callerid: $number
-Set: arg1=$message
+Set: __arg1=message
 
 EOF
 
