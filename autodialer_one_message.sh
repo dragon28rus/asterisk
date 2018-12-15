@@ -54,7 +54,7 @@ RetryTime: 3600
 WaitTime: 50
 Priority: 1
 Callerid: $number
-Set: arg1=$number
+Set: arg1=$message
 
 EOF
 
